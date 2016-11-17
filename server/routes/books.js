@@ -6,6 +6,7 @@ var connectionString = 'postgres://localhost:5432/sigma';
 router.get('/genre/:genre', function(req, res) {
   console.log('get request');
   var genre = req.params.genre;
+  console.log(req.params.genre);
   var req = req;
   var res = res;
   // get ALL books from DB
@@ -18,6 +19,7 @@ router.get('/genre/:genre', function(req, res) {
 });
 
 function getAllGenres(req, res) {
+
   console.log("testestest");
   pg.connect(connectionString, function(err, client, done) {
     if(err) {
@@ -141,6 +143,7 @@ router.get('/genres', function(req, res) {
       console.log("Could not connect to Database to get book Genres");
       res.sendStatus(500);
     }
+    console.log("getting genres");
     client.query('SELECT DISTINCT genre FROM books', function(err, result) {
       done(); // close the connection.
 

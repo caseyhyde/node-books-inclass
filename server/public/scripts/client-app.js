@@ -1,6 +1,7 @@
 $(document).ready(function () {
-    getBooks();
     getGenres();
+    getBooks();
+
     // add a book
     $('#book-submit').on('click', postBook);
     // select books on DOM by genre
@@ -84,6 +85,7 @@ function deleteBook() {
     url: '/books/' + id,
     success: function(result) {
       getBooks();
+      getGenres();
     },
     error: function(result) {
       console.log('could not delete book.');
