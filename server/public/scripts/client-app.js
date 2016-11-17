@@ -1,37 +1,56 @@
 $(document).ready(function () {
     getBooks();
-
+    getGenres();
     // add a book
     $('#book-submit').on('click', postBook);
+    // select books on DOM by genre
+    $('#genres').on('change', getBooks);
     // delete a book
     $("#book-list").on('click', '.delete', deleteBook);
     // update a book
     $("#book-list").on('click', '.update', updateBook);
 });
-/**
- * Retrieve books from server and append to DOM
- */
+/************************************************
+ * Retrieve books from server and append to DOM *
+ ************************************************/
 function getBooks() {
+  var genre = $('#genres option:selected').text();
+  console.log(genre);
+
   $.ajax({
     type: 'GET',
-    url: '/books',
+    url: '/books/genre/' + genre,
     success: function(books) {
+      console.log(books);
       appendBooks(books);
     },
     error: function() {
       console.log('Database error');
     }
-
-  })
+  });
 }
-/**
- * Add a new book to the database and refresh the DOM
- */
+/******************************
+ * Get genres from the server *
+ ******************************/
+function getGenres() {
+  $.ajax({
+    type: 'GET',
+    url: '/books/genres',
+    success: function(genres) {
+      console.log("Genres in database: ", genres);
+      appendGenres(genres);
+    },
+    error: function() {
+      console.log("Error getting genres from server!");
+    }
+  });
+}
+/******************************************************
+ * Add a new book to the database and refresh the DOM *
+ ******************************************************/
 function postBook() {
   event.preventDefault();
-
   var book = {};
-
   $.each($('#book-form').serializeArray(), function (i, field) {
     book[field.name] = field.value;
   });
@@ -46,14 +65,16 @@ function postBook() {
     data: book,
     success: function(response) {
       getBooks();
+      getGenres();
     },
     error: function() {
       console.log('could not post a new book');
     }
-  })
-
+  });
 }
-
+/*******************************************************
+ * Remove a book from the database and refresh the DOM *
+ *******************************************************/
 function deleteBook() {
   var id = $(this).parent().data('id');
   console.log(id);
@@ -69,7 +90,9 @@ function deleteBook() {
     }
   });
 }
-
+/*****************************************************
+ * Update a book in the database and refresh the DOM *
+ *****************************************************/
 function updateBook() {
   var id = $(this).parent().data('id');
   console.log(id);
@@ -96,7 +119,9 @@ function updateBook() {
   });
 
 }
-
+/***************************
+ * Append books to the DOM *
+ ***************************/
 function appendBooks(books) {
   $("#book-list").empty();
 
@@ -130,5 +155,16 @@ function appendBooks(books) {
 
     $el.append('<button class="update">Update</button>');
     $el.append('<button class="delete">Delete</button>');
+  }
+  $('.form-control').val('');
+}
+/***************************************************
+ * Append genres to the genres selector on the DOM *
+ ***************************************************/
+function appendGenres(genres) {
+  $('#genres').empty();
+  $('#genres').append('<option>ALL</option>');
+  for (var i = 0; i < genres.length; i++) {
+    $('#genres').append("<option>" + genres[i].genre + "</option>");
   }
 }
